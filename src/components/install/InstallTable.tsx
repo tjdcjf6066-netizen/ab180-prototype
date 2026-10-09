@@ -2,9 +2,8 @@
 
 import type { ReactNode } from "react";
 import CallMadeIcon from "@mui/icons-material/CallMade";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useNotReady } from "@/components/shell/NotReadyProvider";
+import { CampaignExpandButton } from "@/components/ui/CampaignExpandButton";
 import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { Tag } from "@/components/ui/Tag";
 import { formatDuration } from "@/lib/duration";
@@ -94,7 +93,7 @@ export function InstallTable({ settings, selection, onSelect, includeEnded, expa
                     {channel?.hasPolicyInfo && <PolicyTooltip />}
                   </span>
                   {campaigns.length > 0 && (
-                    <ExpandButton count={campaigns.length} open={isOpen} onClick={() => onToggleExpand(ch.channelId)} />
+                    <CampaignExpandButton count={campaigns.length} open={isOpen} onClick={() => onToggleExpand(ch.channelId)} />
                   )}
                 </span>
               }
@@ -191,24 +190,6 @@ function Row({
         </button>
       </div>
     </div>
-  );
-}
-
-// 3-5 캠페인 펼치기 버튼 — 행 선택과 분리
-function ExpandButton({ count, open, onClick }: { count: number; open: boolean; onClick: () => void }) {
-  const Icon = open ? ExpandLessIcon : ExpandMoreIcon;
-  return (
-    <button
-      type="button"
-      onClick={(e) => {
-        e.stopPropagation();
-        onClick();
-      }}
-      className="flex h-22 items-center gap-4 rounded-6 border border-border bg-white px-8 text-caption font-medium text-text-primary"
-    >
-      캠페인 한정 설정 <span className="text-primary">{count}개</span>
-      <Icon className="text-icon-strong" style={{ fontSize: 14 }} />
-    </button>
   );
 }
 
