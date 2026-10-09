@@ -4,6 +4,7 @@ import { useCallback, useRef, useState, type ReactNode } from "react";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import SearchIcon from "@mui/icons-material/Search";
+import { Popover } from "./Popover";
 import { useOutsideClose } from "./useOutsideClose";
 
 // 새 채널 · 캠페인 행의 선택창 — spec_screens.md 4-7 · 와이어프레임 W2-D · W2-F · W2-F2
@@ -39,8 +40,9 @@ export function PickerSelect<T>({
   const [open, setOpen] = useState(defaultOpen);
   const [query, setQuery] = useState("");
   const boxRef = useRef<HTMLDivElement>(null);
+  const popRef = useRef<HTMLDivElement>(null);
   const close = useCallback(() => setOpen(false), []);
-  useOutsideClose(boxRef, open, close);
+  useOutsideClose([boxRef, popRef], open, close);
 
   const q = query.trim().toLowerCase();
   const total = groups.reduce((n, g) => n + g.items.length, 0);
@@ -62,8 +64,8 @@ export function PickerSelect<T>({
         <Icon className="shrink-0 text-icon-strong" style={{ fontSize: 18 }} />
       </button>
 
-      {open && (
-        <div className="absolute top-full left-0 z-30 mt-4 w-330 rounded-8 border border-border bg-white shadow-dropdown">
+      <Popover anchorRef={boxRef} popRef={popRef} open={open}>
+        <div className="w-330 rounded-8 border border-border bg-white shadow-dropdown">
           <div className="p-12">
             <div className="flex h-38 items-center gap-6 rounded-6 border-2 border-primary px-10 shadow-focus">
               <SearchIcon className="text-text-placeholder" style={{ fontSize: 16 }} />
@@ -104,7 +106,7 @@ export function PickerSelect<T>({
             )}
           </div>
         </div>
-      )}
+      </Popover>
     </div>
   );
 }

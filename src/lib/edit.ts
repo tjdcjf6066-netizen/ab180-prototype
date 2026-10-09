@@ -194,6 +194,9 @@ function makeEditor<S, G, C>(a: Adapter<S, G, C>) {
   };
 }
 
+// 화면에서 탭과 무관하게 편집기를 다루기 위한 타입
+export type Editor<S, G, C> = ReturnType<typeof makeEditor<S, G, C>>;
+
 const installCellsWith = (make: () => Cell): InstallCells =>
   Object.fromEntries(INSTALL_CELL_KEYS.map((k) => [k, make()])) as InstallCells;
 
@@ -258,14 +261,15 @@ export const eventsEditor = {
 
   removeRow: (d: EventsDraft, key: string): EventsDraft => ({ ...d, rows: d.rows.filter((r) => r.key !== key) }),
 
-  // 저장 비활성: 바뀐 내용 없음 / 이벤트를 고르지 않은 빈 행
-  canSave: (s: InAppSettings, d: EventsDraft) =>
-    d.rows.every((r) => r.eventId !== null) &&
+  isDirty: (s: InAppSettings, d: EventsDraft) =>
     !sameRows(
       d.rows.map((r) => ({ id: r.eventId, cells: r.duration })),
       s.events.map((e) => ({ id: e.eventId, cells: e.duration })),
       durationEquals,
     ),
+
+  // 저장 비활성: 바뀐 내용 없음 / 이벤트를 고르지 않은 빈 행
+  canSave: (s: InAppSettings, d: EventsDraft) => d.rows.every((r) => r.eventId !== null) && eventsEditor.isDirty(s, d),
 
   // 새로 등록한 이벤트는 최근 등록순으로 맨 앞(나중에 추가한 행이 더 앞)
   apply: (s: InAppSettings, d: EventsDraft, today: string): InAppSettings => {

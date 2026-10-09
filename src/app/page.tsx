@@ -2,7 +2,8 @@
 
 import { useRef, useState } from "react";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import type { LeaveGuard } from "@/components/install/InstallEditMode";
+import type { LeaveGuard } from "@/components/common/EditMode";
+import { InAppTab } from "@/components/inapp/InAppTab";
 import { InstallTab } from "@/components/install/InstallTab";
 import { useNotReady } from "@/components/shell/NotReadyProvider";
 import { SettingsProvider } from "@/state/SettingsProvider";
@@ -51,7 +52,7 @@ export default function AttributionRulesPage() {
           ))}
         </div>
 
-        <div className="mt-32">{tab === "install" ? <InstallTab guardRef={guardRef} /> : null /* 인앱이벤트 탭은 6단계 */}</div>
+        <div className="mt-32">{tab === "install" ? <InstallTab guardRef={guardRef} /> : <InAppTab guardRef={guardRef} />}</div>
       </div>
     </SettingsProvider>
   );

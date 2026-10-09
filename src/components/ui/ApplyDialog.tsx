@@ -6,7 +6,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import InfoIcon from "@mui/icons-material/Info";
 
 // spec_screens.md 3-7 적용 확인 팝업 (너비 760, 모서리 20) · 와이어프레임 W2-H · W2-I
-export type ApplyNotice = { title: string; body: string };
+export type ApplyNotice = { title: string; body?: string };
 
 const isEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 
@@ -50,7 +50,7 @@ export function ApplyDialog({
             <InfoIcon className="mt-2 text-primary" style={{ fontSize: 18 }} />
             <div className="flex flex-col gap-4">
               <p className="font-bold">{notice.title}</p>
-              <p>{notice.body}</p>
+              {notice.body && <p>{notice.body}</p>}
             </div>
           </div>
         )}

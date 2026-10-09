@@ -8,6 +8,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import SearchIcon from "@mui/icons-material/Search";
 import { formatDuration, inherit, own, UNIT_LABEL, UNIT_OPTIONS, unitOption, type Tab } from "@/lib/duration";
 import type { Cell, Duration, Unit } from "@/lib/types";
+import { Popover } from "./Popover";
 import { useOutsideClose } from "./useOutsideClose";
 
 // spec_screens.md 3-1 값 입력(값 칸 110 + 단위 칸 90) · 3-2 값 드롭다운
@@ -31,6 +32,7 @@ const clamp = (tab: Tab, d: Duration): Duration => {
 export function DurationInput({ tab, cell, shown, follow, disabled, onChange }: Props) {
   const [menu, setMenu] = useState<"value" | "unit" | null>(null);
   const boxRef = useRef<HTMLDivElement>(null);
+  const popRef = useRef<HTMLDivElement>(null);
   // 직접 입력한 값: Enter 또는 바깥을 눌러 닫을 때 적용
   const pending = useRef<Cell | null>(null);
   const close = useCallback(() => {
@@ -38,7 +40,7 @@ export function DurationInput({ tab, cell, shown, follow, disabled, onChange }: 
     pending.current = null;
     setMenu(null);
   }, [onChange]);
-  useOutsideClose(boxRef, menu !== null, close);
+  useOutsideClose([boxRef, popRef], menu !== null, close);
   const toggle = (m: "value" | "unit") => {
     close();
     if (menu !== m) setMenu(m);
@@ -85,7 +87,7 @@ export function DurationInput({ tab, cell, shown, follow, disabled, onChange }: 
         <ExpandMoreIcon className="text-icon-strong" style={{ fontSize: 18 }} />
       </button>
 
-      {menu === "value" && (
+      <Popover anchorRef={boxRef} popRef={popRef} open={menu === "value"}>
         <ValueMenu
           tab={tab}
           cell={cell}
@@ -97,9 +99,9 @@ export function DurationInput({ tab, cell, shown, follow, disabled, onChange }: 
             close();
           }}
         />
-      )}
-      {menu === "unit" && (
-        <div className="absolute top-full left-118 z-30 mt-4 w-90 rounded-8 border border-border bg-white py-6 shadow-dropdown">
+      </Popover>
+      <Popover anchorRef={boxRef} popRef={popRef} open={menu === "unit"} offsetX={118}>
+        <div className="w-90 rounded-8 border border-border bg-white py-6 shadow-dropdown">
           {UNIT_OPTIONS[tab].map((o) => (
             <button
               key={o.unit}
@@ -113,7 +115,7 @@ export function DurationInput({ tab, cell, shown, follow, disabled, onChange }: 
             </button>
           ))}
         </div>
-      )}
+      </Popover>
     </div>
   );
 }
@@ -155,7 +157,7 @@ function ValueMenu({
   const isCurrent = (v: number) => cell.mode === "own" && cell.duration.value === v;
 
   return (
-    <div className="absolute top-full left-0 z-30 mt-4 w-230 rounded-8 border border-border bg-white shadow-dropdown">
+    <div className="w-230 rounded-8 border border-border bg-white shadow-dropdown">
       <div className="p-12">
         <div
           className={`flex h-38 items-center gap-6 rounded-6 border-2 pr-4 pl-10 ${

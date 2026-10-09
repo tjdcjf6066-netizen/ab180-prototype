@@ -47,3 +47,55 @@ export function gwaWa(word: string): "과" | "와" {
   else hasFinal = /[lmn]/i.test(last);
   return hasFinal ? "과" : "와";
 }
+
+// 인앱이벤트 탭(어트리뷰션) 차트 — 설치 탭과 같은 비율(가장 긴 값 = 전체, 최소 13% + 선형). spec_screens.md 5-3
+export type AttrBar = { key: "other" | "event"; ratio: number; tall: boolean; strong: boolean };
+export type AttrLabel = { key: string; text: string; ratio: number };
+export type AttrChart = {
+  max: number;
+  bars: AttrBar[]; // 그리는 순서 = 뒤에서 앞으로
+  labels: AttrLabel[];
+  /** 필터 "선택하지 않음"일 때 위 단계 기준선 */
+  baseline?: AttrLabel;
+};
+
+export function attributionChart(
+  value: Duration,
+  opts: { compare?: { name: string; duration: Duration }; event?: { name: string; duration: Duration } },
+): AttrChart {
+  const { compare, event } = opts;
+  if (!event) {
+    const max = lookbackAxisMax(compare ? [value, compare.duration] : [value]);
+    return {
+      max,
+      bars: [{ key: "other", ratio: lookbackRatio(value, max), tall: true, strong: false }],
+      labels: [{ key: "other", text: `인앱이벤트(${chartDuration(value)})`, ratio: lookbackRatio(value, max) }],
+      baseline: compare && {
+        key: "baseline",
+        text: `${compare.name}(${chartDuration(compare.duration)})`,
+        ratio: lookbackRatio(compare.duration, max),
+      },
+    };
+  }
+  // 막대 두 개: 긴 쪽이 높은 막대(뒤), 짧은 쪽이 낮은 막대(앞). 고른 이벤트는 진한 초록.
+  const max = lookbackAxisMax([value, event.duration]);
+  const other: AttrBar = { key: "other", ratio: lookbackRatio(value, max), tall: false, strong: false };
+  const ev: AttrBar = { key: "event", ratio: lookbackRatio(event.duration, max), tall: false, strong: true };
+  if (sameLength(value, event.duration)) {
+    return {
+      max,
+      bars: [{ ...other, tall: true }, { ...ev, tall: true }],
+      labels: [{ key: "both", text: `그 외 인앱 이벤트 · ${event.name}(${chartDuration(value)})`, ratio: ev.ratio }],
+    };
+  }
+  const eventLonger = toMinutes(event.duration) > toMinutes(value);
+  const bars = eventLonger ? [{ ...ev, tall: true }, other] : [{ ...other, tall: true }, ev];
+  return {
+    max,
+    bars,
+    labels: [
+      { key: "other", text: `그 외 인앱 이벤트(${chartDuration(value)})`, ratio: other.ratio },
+      { key: "event", text: `${event.name}(${chartDuration(event.duration)})`, ratio: ev.ratio },
+    ],
+  };
+}

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useSyncExternalStore, type MouseEvent } from "react";
+import { useState, type MouseEvent } from "react";
+import { usePixelSnap } from "@/components/chart/usePixelSnap";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { lookbackAxisMax, lookbackLabels, lookbackMinutesAt, lookbackRatio } from "@/lib/chart";
 import { toMinutes } from "@/lib/duration";
@@ -18,14 +19,6 @@ const CLICK_H = 62;
 const VIEW_H = 34;
 const TOOLTIP_W = 306;
 const LINE_W = 1.5; // 막대 테두리 · 비교 점선 굵기(운영 대시보드와 비슷하게)
-
-// 화면 픽셀 비율. 선이 소수점 위치에 걸리면 이웃 픽셀로 번져 굵기가 달라 보이므로 위치 · 굵기를 픽셀 격자에 맞춘다.
-const subscribeResize = (cb: () => void) => {
-  window.addEventListener("resize", cb);
-  return () => window.removeEventListener("resize", cb);
-};
-const useDevicePixelRatio = () =>
-  useSyncExternalStore(subscribeResize, () => window.devicePixelRatio || 1, () => 1);
 
 export type ChartRow = {
   name: string;
@@ -49,9 +42,7 @@ export function LookbackChart({ row, compare }: { row: ChartRow; compare?: Chart
   const { clickDevice: click, viewDevice: view } = row.values;
   // 축 기준: 선택한 행의 클릭 · 조회와 비교 점선 중 가장 긴 값
   const max = lookbackAxisMax(compare ? [click, view, compare.click, compare.view] : [click, view]);
-  const dpr = useDevicePixelRatio();
-  const snap = (v: number) => Math.round(v * dpr) / dpr;
-  const lineW = Math.max(1, Math.floor(LINE_W * dpr)) / dpr; // 레티나 1.5px, 일반 모니터 1px
+  const { snap, lineW } = usePixelSnap(LINE_W);
   const xOf = (d: Duration) => snap(INSTALL_X - FULL * lookbackRatio(d, max));
 
   const onMove = (e: MouseEvent<HTMLDivElement>) => {

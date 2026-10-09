@@ -14,8 +14,10 @@ import { resolveInstall } from "@/lib/resolve";
 import { INSTALL_CELL_KEYS, type Campaign, type Duration, type InstallCellKey, type InstallSettings } from "@/lib/types";
 import { useSettings } from "@/state/SettingsProvider";
 import { BottomCards } from "./BottomCards";
-import { InstallEditMode, type LeaveGuard } from "./InstallEditMode";
-import { InstallTable, rowId, type Selection } from "./InstallTable";
+import type { LeaveGuard } from "@/components/common/EditMode";
+import { InstallEditMode } from "./InstallEditMode";
+import { rowId, type Selection } from "@/components/common/SettingsTable";
+import { InstallTable } from "./InstallTable";
 import { LookbackChart, type ChartCompare, type ChartRow } from "./LookbackChart";
 
 const HIGHLIGHT_MS = 2000;
