@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import type { LeaveGuard } from "@/components/install/InstallEditMode";
 import { InstallTab } from "@/components/install/InstallTab";
 import { useNotReady } from "@/components/shell/NotReadyProvider";
 import { SettingsProvider } from "@/state/SettingsProvider";
@@ -16,6 +17,13 @@ const TABS: { key: TopTab; label: string }[] = [
 export default function AttributionRulesPage() {
   const notReady = useNotReady();
   const [tab, setTab] = useState<TopTab>("install");
+  // 수정 중인 탭이 등록한다. 바꾼 내용이 있으면 나가기 팝업 뒤에 이동.
+  const guardRef = useRef<LeaveGuard | null>(null);
+  const changeTab = (next: TopTab) => {
+    if (next === tab) return;
+    if (guardRef.current) guardRef.current(() => setTab(next));
+    else setTab(next);
+  };
 
   return (
     <SettingsProvider>
@@ -33,7 +41,7 @@ export default function AttributionRulesPage() {
             <button
               key={t.key}
               type="button"
-              onClick={() => setTab(t.key)}
+              onClick={() => changeTab(t.key)}
               className={`-mb-1 border-b-3 px-12 pt-8 pb-12 text-tab ${
                 tab === t.key ? "border-text-primary font-medium text-text-primary" : "border-transparent font-regular text-text-secondary"
               }`}
@@ -43,7 +51,7 @@ export default function AttributionRulesPage() {
           ))}
         </div>
 
-        <div className="mt-32">{tab === "install" ? <InstallTab /> : null /* 인앱이벤트 탭은 6단계 */}</div>
+        <div className="mt-32">{tab === "install" ? <InstallTab guardRef={guardRef} /> : null /* 인앱이벤트 탭은 6단계 */}</div>
       </div>
     </SettingsProvider>
   );

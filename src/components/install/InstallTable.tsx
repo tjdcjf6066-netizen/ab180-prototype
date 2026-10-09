@@ -193,8 +193,8 @@ function Row({
   );
 }
 
-// 4-4 광고 채널 정책 ⓘ
-function PolicyTooltip() {
+// 4-4 광고 채널 정책 ⓘ — 조회 · 수정 모드 공통
+export function PolicyTooltip() {
   const notReady = useNotReady();
   return (
     <InfoTooltip>

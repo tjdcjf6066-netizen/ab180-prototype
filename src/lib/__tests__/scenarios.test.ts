@@ -114,15 +114,15 @@ describe("6-3. 설정 담당자 (설치 탭 글로벌 클릭 · 디바이스 7�
   it("Google Ads · iOS 신규 유저 모집은 Google Ads 값 그대로", () => {
     expect(resolveInstall(after, "clickDevice", GOOGLE, IOS_NEW)).toEqual(days(30));
   });
-  it("적용 확인 팝업: 채널 12개 · 캠페인 0개", () => {
-    expect(installSaveNotice(before, after)).toEqual({ channels: 12, campaigns: 0 });
+  it("적용 확인 팝업: 채널 12개 · 캠페인 2개(진행 중 캠페인 한정 설정 전체, 종료 제외)", () => {
+    expect(installSaveNotice(before, after)).toEqual({ channels: 12, campaigns: 2 });
   });
-  it("Google Ads 클릭 · 디바이스를 글로벌 값 따르기로 바꾸면 14일, 채널 11개 · 캠페인 0개", () => {
+  it("Google Ads 클릭 · 디바이스를 글로벌 값 따르기로 바꾸면 14일, 채널 11개 · 캠페인 2개", () => {
     const google = installEditor.toDraft(before).channels.find((r) => r.channelId === GOOGLE)!;
     const d2 = installEditor.setChannelCells(d, google.key, { ...google.cells, clickDevice: inherit() });
     const after2 = installEditor.apply(before, d2, TODAY);
     expect(resolveInstall(after2, "clickDevice", GOOGLE)).toEqual(days(14));
-    expect(installSaveNotice(before, after2)).toEqual({ channels: 11, campaigns: 0 });
+    expect(installSaveNotice(before, after2)).toEqual({ channels: 11, campaigns: 2 });
   });
   it("저장하면 바뀐 행만 최근 수정일이 오늘", () => {
     expect(after.globalUpdatedAt).toBe(TODAY);
@@ -234,10 +234,10 @@ describe("인앱이벤트 탭 저장 · 안내 (spec_screens 5-6)", () => {
   });
   it("글로벌을 바꾸면 인앱 이벤트 · 채널 · 캠페인 개수", () => {
     const after = inAppEditor.apply(s, inAppEditor.setGlobal(base, days(14)), TODAY);
-    // 채널 7개, 진행 중 캠페인은 iOS 신규 유저 모집(Google Ads가 own이라 채널에 포함) → 0
-    expect(inAppSaveNotice(s, after)).toEqual({ kind: "global", events: 2, channels: 7, campaigns: 0 });
+    // 채널 7개, 진행 중 캠페인 한정 설정은 iOS 신규 유저 모집 1개(종료된 여름 시즌 제외)
+    expect(inAppSaveNotice(s, after)).toEqual({ kind: "global", events: 2, channels: 7, campaigns: 1 });
   });
-  it("채널 밖 캠페인은 캠페인 개수에 포함, 종료된 캠페인은 제외", () => {
+  it("새로 추가한 캠페인도 캠페인 개수에 포함, 종료된 캠페인은 제외", () => {
     let d = inAppEditor.setGlobal(base, days(14));
     d = inAppEditor.addCampaignRow(d, APPLE);
     const row = d.campaigns.find((r) => r.campaignId === null)!;
@@ -247,7 +247,7 @@ describe("인앱이벤트 탭 저장 · 안내 (spec_screens 5-6)", () => {
       kind: "global",
       events: 2,
       channels: 7,
-      campaigns: 1,
+      campaigns: 2,
     });
   });
   it("채널 · 캠페인만 바꾸고 인앱 이벤트 설정이 있으면 인앱 이벤트 안내", () => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type MutableRefObject } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import PublicIcon from "@mui/icons-material/Public";
@@ -8,11 +8,13 @@ import { CampaignSearch } from "@/components/common/CampaignSearch";
 import { useNotReady } from "@/components/shell/NotReadyProvider";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Checkbox";
+import { Toast } from "@/components/ui/Toast";
 import { CAMPAIGN_BY_ID, CHANNEL_BY_ID } from "@/lib/mock/catalog";
 import { resolveInstall } from "@/lib/resolve";
 import { INSTALL_CELL_KEYS, type Campaign, type Duration, type InstallCellKey, type InstallSettings } from "@/lib/types";
 import { useSettings } from "@/state/SettingsProvider";
 import { BottomCards } from "./BottomCards";
+import { InstallEditMode, type LeaveGuard } from "./InstallEditMode";
 import { InstallTable, rowId, type Selection } from "./InstallTable";
 import { LookbackChart, type ChartCompare, type ChartRow } from "./LookbackChart";
 
@@ -42,8 +44,11 @@ function chartData(s: InstallSettings, sel: Selection): { row: ChartRow; compare
   };
 }
 
-export function InstallTab() {
-  const { install } = useSettings();
+export function InstallTab({ guardRef }: { guardRef: MutableRefObject<LeaveGuard | null> }) {
+  const { install, setInstall } = useSettings();
+  const [editing, setEditing] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+  const clearToast = useCallback(() => setToast(null), []);
   const notReady = useNotReady();
   const [selection, setSelection] = useState<Selection>({ kind: "global" });
   const [includeEnded, setIncludeEnded] = useState(false);
@@ -83,6 +88,27 @@ export function InstallTab() {
 
   const { row, compare } = useMemo(() => chartData(install, selection), [install, selection]);
 
+  // [수정]: 종료된 캠페인을 보던 중이면 숨긴다는 토스트(W2-C). 조회로 돌아오면 체크는 그대로.
+  const startEdit = () => {
+    setEditing(true);
+    if (includeEnded) setToast("수정 중에는 종료된 캠페인이 표시되지 않습니다.");
+  };
+
+  // 적용하면 저장 후 조회로. 선택한 행이 삭제됐으면 글로벌 선택.
+  const onExit = useCallback(
+    (saved: InstallSettings | null) => {
+      setEditing(false);
+      if (!saved) return;
+      setInstall(saved);
+      const exists =
+        selection.kind === "global" ||
+        (selection.kind === "channel" && saved.channels.some((c) => c.channelId === selection.channelId)) ||
+        (selection.kind === "campaign" && saved.campaigns.some((c) => c.campaignId === selection.campaignId));
+      if (!exists) setSelection({ kind: "global" });
+    },
+    [selection, setInstall],
+  );
+
   return (
     <div className="pb-70">
       <p className="text-body">
@@ -104,39 +130,53 @@ export function InstallTab() {
             아래 차트는 유저 식별 방법 중에 [디바이스 ID 매칭]을 기준으로 표시됩니다.
           </span>
         </div>
-        {/* 수정 모드는 5단계 */}
-        <Button variant="outline" className="h-36 px-16">
-          <EditIcon style={{ fontSize: 16 }} />
-          수정
-        </Button>
+        {!editing && (
+          <Button variant="outline" className="h-36 px-16" onClick={startEdit}>
+            <EditIcon style={{ fontSize: 16 }} />
+            수정
+          </Button>
+        )}
       </div>
 
-      <div className="mt-20">
+      {/* 수정 중에는 차트를 Dim. 수정 중 값은 차트에 반영하지 않는다. */}
+      <div className="relative mt-20">
         <LookbackChart row={row} compare={compare} />
+        {editing && (
+          <div className="absolute inset-0 rounded-8 bg-overlay">
+            <span className="absolute top-16 left-16 text-caption font-medium text-white">수정 중</span>
+          </div>
+        )}
       </div>
 
-      <div className="mt-20 flex items-center justify-end gap-16">
-        <Checkbox checked={includeEnded} onChange={onIncludeEnded}>
-          종료된 캠페인 포함
-        </Checkbox>
-        <CampaignSearch settings={install.campaigns} includeEnded={includeEnded} onPick={onPick} />
-      </div>
+      {editing ? (
+        <InstallEditMode settings={install} onExit={onExit} guardRef={guardRef} />
+      ) : (
+        <>
+          <div className="mt-20 flex items-center justify-end gap-16">
+            <Checkbox checked={includeEnded} onChange={onIncludeEnded}>
+              종료된 캠페인 포함
+            </Checkbox>
+            <CampaignSearch settings={install.campaigns} includeEnded={includeEnded} onPick={onPick} />
+          </div>
 
-      <div className="mt-20">
-        <InstallTable
-          settings={install}
-          selection={selection}
-          onSelect={setSelection}
-          includeEnded={includeEnded}
-          expanded={expanded}
-          onToggleExpand={toggleExpand}
-          highlight={highlight}
-        />
-      </div>
+          <div className="mt-20">
+            <InstallTable
+              settings={install}
+              selection={selection}
+              onSelect={setSelection}
+              includeEnded={includeEnded}
+              expanded={expanded}
+              onToggleExpand={toggleExpand}
+              highlight={highlight}
+            />
+          </div>
+        </>
+      )}
 
       <div className="mt-32">
         <BottomCards />
       </div>
+      <Toast message={toast} onDone={clearToast} />
     </div>
   );
 }

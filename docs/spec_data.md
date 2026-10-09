@@ -92,7 +92,7 @@ function resolveInApp(s: InAppSettings, eventId?: string, channelId?: string, ca
 ### 4-1. 적용 확인 팝업 개수 계산 (글로벌을 바꿨을 때)
 바꾼 글로벌 칸(설치 탭은 칸별, 바뀐 칸이 여러 개면 합집합)에 대해, **저장한 뒤의 상태** 기준으로
 - **채널 N** = 그 칸이 own인 채널 수
-- **캠페인 N** = 그 칸이 own인 **진행 중** 캠페인 중, 속한 채널은 그 칸이 inherit인 것 (own 채널 안의 캠페인은 "그 안의 캠페인 포함"으로 이미 포함)
+- **캠페인 N** = **진행 중** 캠페인 한정 설정 전체(속한 채널 · 바꾼 칸과 관계없이 셈, 종료된 캠페인 제외). 두 탭 공통.
 - **인앱 이벤트 N** (인앱이벤트 탭만) = 기간을 설정한 인앱 이벤트 수
 - 인앱이벤트 탭에서 채널 · 캠페인만 바꿨을 때: **인앱 이벤트 N** = 기간을 설정한 인앱 이벤트 수(1 이상일 때만 안내)
 - 채널 삭제 팝업의 캠페인 N = 그 채널의 캠페인 설정 수(종료 포함)
@@ -175,8 +175,8 @@ Google Ads(ⓘ 정책) · Meta Ads · Apple Search Ads · TikTok for Business ·
 - 목록에 없는 채널(예: Meta Ads)의 clickDevice = **14일**
 - 목록의 12개 채널 clickDevice = 그대로(own)
 - Google Ads · iOS 신규 유저 모집 clickDevice = 30일 그대로(Google Ads 따름)
-- 적용 확인 팝업: "채널 **12개**(그 안의 캠페인 포함) · 캠페인 **0개**에는 반영되지 않습니다."
-- 담당자가 Google Ads clickDevice를 "글로벌 값 따르기"로 바꾸고 저장하면 Google Ads clickDevice = 14일, 팝업 숫자는 채널 11개 · 캠페인 0개(Apple Search Ads · 브랜드 검색은 Apple Search Ads가 own이라 채널에 포함)
+- 적용 확인 팝업: "채널 **12개**(그 안의 캠페인 포함) · 캠페인 **2개**에는 반영되지 않습니다." (진행 중 iOS 신규 유저 모집 · 브랜드 검색)
+- 담당자가 Google Ads clickDevice를 "글로벌 값 따르기"로 바꾸고 저장하면 Google Ads clickDevice = 14일, 팝업 숫자는 채널 11개 · 캠페인 2개
 
 ### 6-4. 신규 마케터
 - 설치 탭 진입: 글로벌 선택, 차트 클릭 7일 · 조회 1일, 목록 13행(글로벌 + 12채널), Google Ads · Apple Search Ads에 [캠페인 한정 설정 1개]

@@ -6,14 +6,12 @@ import { INSTALL_CELL_KEYS, type InAppSettings, type InstallSettings } from "./t
 type Row = { id: string; owns: boolean };
 
 // 채널 N = 바뀐 칸 중 하나라도 own인 채널
-// 캠페인 N = 바뀐 칸 중 하나라도 own인 진행 중 캠페인 중, 속한 채널이 채널 N에 들지 않은 것
-function countExcluded(channels: Row[], campaigns: Row[]) {
-  const ownChannels = new Set(channels.filter((c) => c.owns).map((c) => c.id));
-  const ownCampaigns = campaigns.filter((c) => {
-    const campaign = CAMPAIGN_BY_ID.get(c.id);
-    return c.owns && campaign?.status === "active" && !ownChannels.has(campaign.channelId);
-  });
-  return { channels: ownChannels.size, campaigns: ownCampaigns.length };
+// 캠페인 N = 진행 중 캠페인 한정 설정 전체(속한 채널 · 바꾼 칸과 관계없이). 종료된 캠페인은 제외.
+function countExcluded(channels: Row[], campaignIds: string[]) {
+  return {
+    channels: channels.filter((c) => c.owns).length,
+    campaigns: campaignIds.filter((id) => CAMPAIGN_BY_ID.get(id)?.status === "active").length,
+  };
 }
 
 // 설치 탭: 글로벌을 바꿨을 때만 안내 박스. 저장한 뒤의 상태(after) 기준.
@@ -23,7 +21,7 @@ export function installSaveNotice(before: InstallSettings, after: InstallSetting
   const owns = (cells: InstallSettings["channels"][number]["cells"]) => changed.some((k) => cells[k].mode === "own");
   return countExcluded(
     after.channels.map((c) => ({ id: c.channelId, owns: owns(c.cells) })),
-    after.campaigns.map((c) => ({ id: c.campaignId, owns: owns(c.cells) })),
+    after.campaigns.map((c) => c.campaignId),
   );
 }
 
@@ -40,7 +38,7 @@ export function inAppSaveNotice(before: InAppSettings, after: InAppSettings): In
       events,
       ...countExcluded(
         after.channels.map((c) => ({ id: c.channelId, owns: c.cell.mode === "own" })),
-        after.campaigns.map((c) => ({ id: c.campaignId, owns: c.cell.mode === "own" })),
+        after.campaigns.map((c) => c.campaignId),
       ),
     };
   }

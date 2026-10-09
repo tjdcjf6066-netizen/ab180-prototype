@@ -90,6 +90,7 @@ function makeEditor<S, G, C>(a: Adapter<S, G, C>) {
 
   return {
     toDraft,
+    isDirty,
 
     setGlobal: (d: D, global: G): D => ({ ...d, global }),
 
