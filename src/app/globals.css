@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+/* 디자인 토큰 — docs/spec_screens.md 1장. 토큰 밖의 값은 쓰지 않도록 Tailwind 기본값을 지운다. */
+@theme {
+  /* 1-1. 색 */
+  --color-*: initial;
+  --color-text-primary: #1c1f24;
+  --color-text-secondary: #6b7380;
+  --color-text-placeholder: #9ea3ad;
+  --color-text-danger: #e03333;
+  --color-primary: #3366f2;
+  --color-primary-weak: #edf3ff;
+  --color-border: #dbe0e8;
+  --color-divider: #e5e8ed;
+  --color-bg-subtle: #f6f7f9;
+  --color-bg-muted: #edf0f2;
+  --color-danger: #ed4747;
+  --color-icon-strong: #3a3f47;
+  --color-icon: #6b7380;
+  --color-overlay: rgba(0, 0, 0, 0.5);
+  --color-tooltip-info: #e2f7ff;
+  --color-chart-lookback-light: #ccdbfa;
+  --color-chart-lookback-strong: #6194fa;
+  --color-chart-lookback-line: #3366f2;
+  --color-chart-attr-light: #e3f5e8;
+  --color-chart-attr-strong: #8ccca3;
+  --color-chart-attr-line: #338059;
+  --color-white: #ffffff;
+
+  /* 1-2. 글자 (줄 높이 1.5) */
+  --font-sans: var(--font-noto-sans-kr), sans-serif;
+  --text-*: initial;
+  --text-page-title: 28px;
+  --text-page-title--line-height: 1.5;
+  --text-modal-title: 22px;
+  --text-modal-title--line-height: 1.5;
+  --text-modal-title-sm: 20px;
+  --text-modal-title-sm--line-height: 1.5;
+  --text-tab: 17px;
+  --text-tab--line-height: 1.5;
+  --text-section: 16px;
+  --text-section--line-height: 1.5;
+  --text-sub-tab: 15px;
+  --text-sub-tab--line-height: 1.5;
+  --text-layer-title: 15px;
+  --text-layer-title--line-height: 1.5;
+  --text-body: 14px;
+  --text-body--line-height: 1.5;
+  --text-body-sm: 13px;
+  --text-body-sm--line-height: 1.5;
+  --text-caption: 12px;
+  --text-caption--line-height: 1.5;
+  --text-tag: 11px;
+  --text-tag--line-height: 1.5;
+  --font-weight-*: initial;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+
+  /* 1-3. 모서리 · 그림자 */
+  --radius-*: initial;
+  --radius-4: 4px;
+  --radius-6: 6px;
+  --radius-8: 8px;
+  --radius-12: 12px;
+  --radius-20: 20px;
+  --shadow-*: initial;
+  --shadow-dropdown: 0 4px 14px rgba(0, 0, 0, 0.12);
+  --shadow-focus: 0 0 0 3px rgba(51, 102, 242, 0.18);
+
+  /* 간격: 숫자 = px (p-16 = 16px, w-110 = 110px) */
+  --spacing: 1px;
+}
+
+body {
+  background: var(--color-white);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+}
