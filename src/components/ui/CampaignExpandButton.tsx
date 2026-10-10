@@ -2,18 +2,20 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 // spec_screens.md 3-5 캠페인 펼치기 버튼 — 두 탭 · 조회 · 수정 모드 공통. 행 선택과 분리.
-// 테두리는 눈에 띄도록 text-primary(진한 검정).
+// 테두리: 조회 모드는 진한 검정(text-primary), 수정 모드는 파랑(primary).
 // suffix: 수정 모드의 " 보기 · 추가" / " 접기"
 export function CampaignExpandButton({
   count,
   open,
   onClick,
   suffix = "",
+  editing = false,
 }: {
   count: number;
   open: boolean;
   onClick: () => void;
   suffix?: string;
+  editing?: boolean;
 }) {
   const Icon = open ? ExpandLessIcon : ExpandMoreIcon;
   return (
@@ -23,7 +25,7 @@ export function CampaignExpandButton({
         e.stopPropagation();
         onClick();
       }}
-      className="flex h-22 items-center gap-4 rounded-6 border border-text-primary bg-white px-8 text-caption font-medium text-text-primary"
+      className={`flex h-22 items-center gap-4 rounded-6 border bg-white px-8 text-caption font-medium text-text-primary ${editing ? "border-primary" : "border-text-primary"}`}
     >
       캠페인 한정 설정 <span className="text-primary">{count}개</span>
       {suffix}

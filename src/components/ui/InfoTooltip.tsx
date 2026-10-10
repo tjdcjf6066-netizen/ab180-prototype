@@ -16,7 +16,7 @@ export function InfoTooltip({ children, size = 15 }: { children?: ReactNode; siz
       <InfoOutlinedIcon className="text-icon" style={{ fontSize: size }} />
       {open && children && (
         <span className="absolute top-full left-0 z-30 pt-6">
-          <span className="block w-max max-w-360 rounded-6 bg-tooltip-info px-12 py-10 text-body-sm font-regular text-text-primary shadow-dropdown">
+          <span className="block w-max max-w-360 rounded-6 break-keep bg-tooltip-info px-12 py-10 text-body-sm font-regular text-text-primary shadow-dropdown">
             {children}
           </span>
         </span>

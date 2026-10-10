@@ -174,7 +174,10 @@ export function InAppTab({ guardRef }: { guardRef: MutableRefObject<LeaveGuard |
       <div className="mt-24 flex items-center justify-between">
         <div className="flex items-center gap-8">
           <h2 className="text-section font-medium">설치에 대한 어트리뷰션 윈도우</h2>
-          <InfoTooltip>이 기간에 있는 인앱이벤트는 설치 이벤트에 기여한 채널의 성과가 됩니다.</InfoTooltip>
+          <InfoTooltip>
+            이 기간에 있는 인앱이벤트는 설치 이벤트에 기여한 채널 · 캠페인의 성과가 됩니다. 기간은 인앱 이벤트 설정 → 캠페인 → 채널 →
+            글로벌 순으로 먼저 설정된 값이 적용됩니다.
+          </InfoTooltip>
         </div>
         {!editing && (
           <Button variant="outline" className="h-36 px-16" onClick={startEdit}>

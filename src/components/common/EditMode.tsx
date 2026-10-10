@@ -323,7 +323,7 @@ function ChannelBlock<S, G, C>({
                 {config.channelInfo?.(channel)}
               </span>
               {campaigns.length > 0 ? (
-                <CampaignExpandButton count={campaigns.length} open={open} onClick={onToggle} suffix={open ? " 접기" : " 보기 · 추가"} />
+                <CampaignExpandButton editing count={campaigns.length} open={open} onClick={onToggle} suffix={open ? " 접기" : " 보기 · 추가"} />
               ) : (
                 <AddCampaignLink onClick={onAddCampaign} />
               )}

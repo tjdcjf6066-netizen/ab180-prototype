@@ -2,12 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type MutableRefObject } from "react";
 import EditIcon from "@mui/icons-material/Edit";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import PublicIcon from "@mui/icons-material/Public";
 import { CampaignSearch } from "@/components/common/CampaignSearch";
 import { useNotReady } from "@/components/shell/NotReadyProvider";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Checkbox";
+import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { Toast } from "@/components/ui/Toast";
 import { CAMPAIGN_BY_ID, CHANNEL_BY_ID } from "@/lib/mock/catalog";
 import { resolveInstall } from "@/lib/resolve";
@@ -127,7 +127,10 @@ export function InstallTab({ guardRef }: { guardRef: MutableRefObject<LeaveGuard
       <div className="mt-20 flex items-center justify-between">
         <div className="flex items-center gap-8">
           <h2 className="text-section font-medium">룩백 윈도우</h2>
-          <InfoOutlinedIcon className="text-icon" style={{ fontSize: 15 }} />
+          <InfoTooltip>
+            에어브릿지 어트리뷰션 모델에 따라 룩백 윈도우에 있는 터치포인트를 발생시킨 채널 · 캠페인 중에 설치 이벤트에 기여한 채널 · 캠페인이
+            결정됩니다. 룩백 윈도우는 캠페인 → 채널 → 글로벌 순으로 먼저 설정된 값이 적용됩니다.
+          </InfoTooltip>
           <span className="text-body-sm text-text-secondary">
             아래 차트는 유저 식별 방법 중에 [디바이스 ID 매칭]을 기준으로 표시됩니다.
           </span>
