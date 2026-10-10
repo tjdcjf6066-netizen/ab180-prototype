@@ -83,6 +83,12 @@ export function EventPeriodDialog({ settings, onClose, onSaved }: Props) {
             </div>
             {/* 팝업 높이는 고정하고 목록만 스크롤(W3-P3). 최대 360, 화면이 낮으면 더 줄어듦 */}
             <div ref={listRef} className="max-h-360 min-h-0 overflow-y-auto">
+              {/* 빈 상태: 표를 비워 두지 않고 안내(필터 드롭다운과 같은 문구) */}
+              {draft.rows.length === 0 && (
+                <p className="border-t border-divider py-24 text-center text-body-sm text-text-placeholder">
+                  기간을 설정한 인앱 이벤트가 없습니다.
+                </p>
+              )}
               {draft.rows.map((r) => {
                 const ev = r.eventId ? EVENT_BY_ID.get(r.eventId) : undefined;
                 return (
