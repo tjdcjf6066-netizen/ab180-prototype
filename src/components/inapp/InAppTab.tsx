@@ -148,7 +148,7 @@ export function InAppTab({ guardRef }: { guardRef: MutableRefObject<LeaveGuard |
       <p className="text-body">
         타겟 이벤트인 설치, 딥링크 실행, 딥링크 페이지뷰에 대한 어트리뷰션 윈도우를 설정할 수 있습니다. 어트리뷰션 윈도우는
         타겟 이벤트 후에 발생한 전환인 인앱이벤트가 타겟 이벤트와 관련 있다고 판단되는 기간입니다. 이때 어떤 인앱이벤트가
-        여러 타겟 이벤트의 어트리뷰션 윈도우에 있으면 가장 최근에 발생한 타겟 이벤트에 기여한 채널의 성과로 측정됩니다.
+        여러 타겟 이벤트의 어트리뷰션 윈도우에 있으면 가장 최근에 발생한 타겟 이벤트에 기여한 채널 · 캠페인의 성과로 측정됩니다.
       </p>
       <button type="button" onClick={notReady} className="mt-6 flex items-center gap-4 text-caption text-text-secondary">
         <PublicIcon style={{ fontSize: 14 }} />
