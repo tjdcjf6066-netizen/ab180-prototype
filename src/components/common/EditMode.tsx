@@ -62,6 +62,8 @@ const rowDomId = (key: string) => `edit-row-${key}`;
 export function EditMode<S, G, C>({ config, settings, onExit, guardRef }: Props<S, G, C>) {
   const { editor } = config;
   const [draft, setDraft] = useState<Draft<G, C>>(() => editor.toDraft(settings));
+  // 진입 시점에 저장돼 있던 캠페인 행. 수정 중에 추가한 행은 저장 후 다음 진입부터 셈, 지운 행은 즉시 빠짐.
+  const [savedKeys] = useState(() => new Set(draft.campaigns.map((r) => r.key)));
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [highlight, setHighlight] = useState<string | null>(null);
   const [applyOpen, setApplyOpen] = useState(false);
@@ -124,6 +126,10 @@ export function EditMode<S, G, C>({ config, settings, onExit, guardRef }: Props<
     draft.campaigns.filter(
       (r) => r.channelId === channelId && (r.campaignId === null || CAMPAIGN_BY_ID.get(r.campaignId)?.status === "active"),
     );
+  const savedCount = new Map<string, number>();
+  for (const r of draft.campaigns)
+    if (savedKeys.has(r.key) && r.campaignId && CAMPAIGN_BY_ID.get(r.campaignId)?.status === "active")
+      savedCount.set(r.channelId, (savedCount.get(r.channelId) ?? 0) + 1);
   const addedChannelIds = new Set(draft.channels.map((r) => r.channelId));
   const addedCampaignIds = new Set(draft.campaigns.map((r) => r.campaignId));
   const pickableChannels = CHANNELS.filter((c) => !addedChannelIds.has(c.id)).sort((a, b) => a.name.localeCompare(b.name, "en"));
@@ -200,7 +206,8 @@ export function EditMode<S, G, C>({ config, settings, onExit, guardRef }: Props<
             row={row}
             draft={draft}
             settings={settings}
-            open={row.channelId !== null && expanded.has(row.channelId)}
+            savedCount={row.channelId ? (savedCount.get(row.channelId) ?? 0) : 0}
+            open={row.channelId !== null && (!savedCount.get(row.channelId) || expanded.has(row.channelId))}
             highlight={highlight}
             campaigns={row.channelId ? visibleCampaigns(row.channelId) : []}
             pickableChannels={pickableChannels}
@@ -280,6 +287,7 @@ function ChannelBlock<S, G, C>({
   row,
   draft,
   settings,
+  savedCount,
   open,
   highlight,
   campaigns,
@@ -294,6 +302,7 @@ function ChannelBlock<S, G, C>({
   row: ChannelRow<C>;
   draft: Draft<G, C>;
   settings: S;
+  savedCount: number;
   open: boolean;
   highlight: string | null;
   campaigns: CampaignRow<C>[];
@@ -322,8 +331,8 @@ function ChannelBlock<S, G, C>({
                 {channel.name}
                 {config.channelInfo?.(channel)}
               </span>
-              {campaigns.length > 0 ? (
-                <CampaignExpandButton editing count={campaigns.length} open={open} onClick={onToggle} suffix={open ? " 접기" : " 보기 · 추가"} />
+              {savedCount > 0 ? (
+                <CampaignExpandButton editing count={savedCount} open={open} onClick={onToggle} suffix={open ? " 접기" : " 보기 · 추가"} />
               ) : (
                 <AddCampaignLink onClick={onAddCampaign} />
               )}
@@ -361,12 +370,14 @@ function ChannelBlock<S, G, C>({
 
       {open && channel && (
         <>
-          <div className={`${config.grid} min-h-48 border-t border-divider`}>
-            <div className="flex items-center gap-8 pr-16 pl-28">
-              <Elbow />
-              <AddCampaignLink onClick={onAddCampaign} size="body-sm" />
+          {savedCount > 0 && (
+            <div className={`${config.grid} min-h-48 border-t border-divider`}>
+              <div className="flex items-center gap-8 pr-16 pl-28">
+                <Elbow />
+                <AddCampaignLink onClick={onAddCampaign} size="body-sm" />
+              </div>
             </div>
-          </div>
+          )}
           {campaigns.map((cr) => {
             const campaign = cr.campaignId ? CAMPAIGN_BY_ID.get(cr.campaignId) : undefined;
             const id = rowDomId(cr.key);
