@@ -150,9 +150,9 @@ export function AttributionChart({ row, compare, event }: Props) {
                 <div key={i}>
                   {l.title && <div className="font-medium">{l.title}</div>}
                   {l.inside ? (
-                    <div className="text-primary">인앱이벤트는 설치 이벤트에 기여한 채널의 성과가 됩니다.</div>
+                    <div className="text-primary">인앱이벤트는 설치 이벤트에 기여한 채널 · 캠페인의 성과가 됩니다.</div>
                   ) : (
-                    <div className="text-text-placeholder">인앱이벤트는 채널의 성과가 되지 않습니다.</div>
+                    <div className="text-text-placeholder">인앱이벤트는 채널 · 캠페인의 성과가 되지 않습니다.</div>
                   )}
                 </div>
               ))}
