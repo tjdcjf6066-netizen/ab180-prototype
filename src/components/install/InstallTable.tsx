@@ -7,7 +7,7 @@ import { formatDuration } from "@/lib/duration";
 import { resolveInstall } from "@/lib/resolve";
 import { INSTALL_CELL_KEYS, type InstallSettings } from "@/lib/types";
 
-// 설치 탭 목록 — spec_screens.md 4-3 · 와이어프레임 W1. 열 너비 380 · 200 × 4 · 120 = 1300
+// 설치 탭 목록 — spec_screens.md 4-3 · 와이어프레임 W1. 열 비율 380 : 200 × 4 : 120 (콘텐츠 1300일 때 그 px)
 const HEADERS: [string, string][] = [
   ["클릭", "디바이스 ID 매칭"],
   ["클릭", "확률적 모델링"],
@@ -28,7 +28,7 @@ type Props = {
 export function InstallTable({ settings, ...rest }: Props) {
   return (
     <SettingsTable
-      grid="grid grid-cols-[380px_200px_200px_200px_200px_120px]"
+      grid="grid grid-cols-[minmax(0,380fr)_repeat(4,minmax(0,200fr))_minmax(120px,120fr)]"
       headers={HEADERS.map(([a, b]) => (
         <>
           <span>{a}</span>

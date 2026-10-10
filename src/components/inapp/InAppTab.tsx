@@ -27,11 +27,11 @@ import { EventPeriodDialog } from "./EventPeriodDialog";
 const HIGHLIGHT_MS = 2000;
 const SUB_TABS = ["설치", "딥링크 실행", "딥링크 페이지뷰"] as const;
 
-// 수정 모드: 값 한 칸, 인앱이벤트 단위. 열: 이름 700 · 값 480 · 아이콘 120
+// 수정 모드: 값 한 칸, 인앱이벤트 단위. 열 비율: 이름 700 : 값 480, 아이콘 64
 const inAppEditConfig: EditConfig<InAppSettings, Duration, Cell> = {
   tab: "inApp",
   editor: inAppEditor,
-  grid: "grid grid-cols-[700px_480px_120px]",
+  grid: "grid grid-cols-[minmax(200px,700fr)_minmax(232px,480fr)_64px]",
   keys: ["install"],
   headers: ["설치"],
   defaults: (s) => s.defaults,
@@ -229,7 +229,7 @@ export function InAppTab({ guardRef }: { guardRef: MutableRefObject<LeaveGuard |
           </div>
           <div className="mt-20">
             <SettingsTable
-              grid="grid grid-cols-[700px_400px_200px]"
+              grid="grid grid-cols-[minmax(0,700fr)_minmax(0,400fr)_minmax(120px,200fr)]"
               headers={["설치"]}
               global={{ cells: [{ text: formatDuration(inApp.global) }], updatedAt: inApp.globalUpdatedAt }}
               channels={inApp.channels}

@@ -451,14 +451,14 @@ function EditRow({
   return (
     <div id={id} className={`${grid} min-h-70 scroll-mt-16 border-t border-divider text-body`}>
       <div
-        className={`flex items-center py-12 pr-16 transition-colors duration-300 ${indent ? "pl-28" : "pl-16"} ${
+        className={`flex items-center py-12 pr-8 transition-colors duration-300 ${indent ? "pl-28" : "pl-16"} ${
           highlighted ? "bg-primary-weak" : ""
         }`}
       >
         {name}
       </div>
       {cells.map((c, i) => (
-        <div key={i} className="flex items-center px-12">
+        <div key={i} className="flex min-w-0 items-center px-8">
           {c}
         </div>
       ))}

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, type MouseEvent } from "react";
+import { useRef, useState, type MouseEvent } from "react";
+import { useElementWidth } from "@/components/chart/useElementWidth";
 import { usePixelSnap } from "@/components/chart/usePixelSnap";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { lookbackAxisMax, lookbackLabels, lookbackMinutesAt, lookbackRatio } from "@/lib/chart";
@@ -10,10 +11,8 @@ import type { Duration, InstallCellKey } from "@/lib/types";
 // spec_screens.md 4-2 · 와이어프레임 W1-A · W1-E. 좌표는 와이어프레임 차트 프레임(1300 × 190) 기준.
 // 막대 길이는 운영 중인 대시보드와 같게: 가장 긴 값 = 전체, 최소 13% + 선형(lib/chart.ts).
 const AXIS_LEFT = 16;
-const AXIS_RIGHT = 1284;
-const INSTALL_X = 1180; // 설치 지점 세로선. 막대는 여기서 왼쪽으로 뻗는다.
+const RIGHT_GAP = 120; // 설치 지점 오른쪽 "⤓ 설치" 라벨 자리. 설치 지점 = 차트 너비 - 120
 const BAR_START = 220; // 가장 긴 막대의 왼쪽 끝. "터치포인트" 라벨과 겹치지 않도록 축 시작보다 안쪽
-const FULL = INSTALL_X - BAR_START;
 const BASE_Y = 150;
 const CLICK_H = 62;
 const VIEW_H = 34;
@@ -38,6 +37,12 @@ const ROWS: { group: string; key: InstallCellKey; label: string }[] = [
 ];
 
 export function LookbackChart({ row, compare }: { row: ChartRow; compare?: ChartCompare }) {
+  // 콘텐츠 너비에 맞춰 좌표 계산: 양 끝 라벨 자리는 고정, 막대 구간만 늘고 줄어든다
+  const boxRef = useRef<HTMLDivElement>(null);
+  const width = useElementWidth(boxRef);
+  const AXIS_RIGHT = width - 16;
+  const INSTALL_X = width - RIGHT_GAP; // 설치 지점 세로선. 막대는 여기서 왼쪽으로 뻗는다.
+  const FULL = INSTALL_X - BAR_START;
   const [hoverX, setHoverX] = useState<number | null>(null);
   const { clickDevice: click, viewDevice: view } = row.values;
   // 축 기준: 선택한 행의 클릭 · 조회와 비교 점선 중 가장 긴 값
@@ -57,6 +62,7 @@ export function LookbackChart({ row, compare }: { row: ChartRow; compare?: Chart
 
   return (
     <div
+      ref={boxRef}
       className="relative h-190 overflow-hidden rounded-8 border border-border bg-white"
       onMouseMove={onMove}
       onMouseLeave={() => setHoverX(null)}
@@ -66,8 +72,8 @@ export function LookbackChart({ row, compare }: { row: ChartRow; compare?: Chart
       <div className="absolute w-1 bg-divider" style={{ left: INSTALL_X, top: 0, height: BASE_Y }} />
 
       {/* 막대: 클릭(높은 연한 막대, 뒤) · 조회(낮은 진한 막대, 앞). 0도 최소 길이로 그린다. */}
-      <Bar left={xOf(click)} lineW={lineW} height={CLICK_H} className="bg-chart-lookback-light" />
-      <Bar left={xOf(view)} lineW={lineW} height={VIEW_H} className="bg-chart-lookback-strong" />
+      <Bar installX={INSTALL_X} left={xOf(click)} lineW={lineW} height={CLICK_H} className="bg-chart-lookback-light" />
+      <Bar installX={INSTALL_X} left={xOf(view)} lineW={lineW} height={VIEW_H} className="bg-chart-lookback-strong" />
 
       {/* 비교 점선: 위 단계 값. 0도 최소 길이 위치에 점선으로 */}
       {compare &&
@@ -148,12 +154,24 @@ export function LookbackChart({ row, compare }: { row: ChartRow; compare?: Chart
 }
 
 // 막대 왼쪽 끝 아래에 ▼ 표시(운영 대시보드와 같음)
-function Bar({ left, lineW, height, className }: { left: number; lineW: number; height: number; className: string }) {
+function Bar({
+  installX,
+  left,
+  lineW,
+  height,
+  className,
+}: {
+  installX: number;
+  left: number;
+  lineW: number;
+  height: number;
+  className: string;
+}) {
   return (
     <>
       <div
         className={`absolute border-solid border-chart-lookback-line ${className}`}
-        style={{ left, width: INSTALL_X - left, top: BASE_Y - height, height, borderWidth: lineW }}
+        style={{ left, width: installX - left, top: BASE_Y - height, height, borderWidth: lineW }}
       />
       <div
         className="absolute size-0 -translate-x-1/2 border-x-4 border-t-6 border-x-transparent border-t-chart-lookback-line"

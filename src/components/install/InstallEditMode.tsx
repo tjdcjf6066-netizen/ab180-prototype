@@ -7,7 +7,7 @@ import { installSaveNotice } from "@/lib/notice";
 import { INSTALL_CELL_KEYS, type Duration, type InstallCellKey, type InstallCells, type InstallSettings } from "@/lib/types";
 import { PolicyTooltip } from "./InstallTable";
 
-// 설치 탭 수정 모드 — spec_screens.md 4-7 · 4-8 · 와이어프레임 W2. 열: 이름 300 · 값 230 × 4 · 아이콘 80 = 1300
+// 설치 탭 수정 모드 — spec_screens.md 4-7 · 4-8 · 와이어프레임 W2. 열: 이름(남는 너비, 최소 222: 보기 · 추가 버튼이 들어가는 폭) · 값 200~230 × 4 · 아이콘 64
 type G = Record<InstallCellKey, Duration>;
 
 const HEADERS: [string, string][] = [
@@ -20,7 +20,7 @@ const HEADERS: [string, string][] = [
 const installEditConfig: EditConfig<InstallSettings, G, InstallCells> = {
   tab: "install",
   editor: installEditor,
-  grid: "grid grid-cols-[300px_230px_230px_230px_230px_80px]",
+  grid: "grid grid-cols-[minmax(222px,1fr)_repeat(4,minmax(200px,230px))_64px]",
   keys: INSTALL_CELL_KEYS,
   headers: HEADERS.map(([a, b]) => (
     <>

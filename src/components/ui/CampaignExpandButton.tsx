@@ -25,7 +25,7 @@ export function CampaignExpandButton({
         e.stopPropagation();
         onClick();
       }}
-      className={`flex h-22 items-center gap-4 rounded-6 border bg-white px-8 text-caption font-medium text-text-primary ${editing ? "border-primary" : "border-text-primary"}`}
+      className={`flex h-22 shrink-0 items-center gap-4 rounded-6 border bg-white whitespace-nowrap px-8 text-caption font-medium text-text-primary ${editing ? "border-primary" : "border-text-primary"}`}
     >
       캠페인 한정 설정 <span className="text-primary">{count}개</span>
       {suffix}

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, type MouseEvent } from "react";
+import { useRef, useState, type MouseEvent } from "react";
+import { useElementWidth } from "@/components/chart/useElementWidth";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { usePixelSnap } from "@/components/chart/usePixelSnap";
 import { attributionChart, lookbackMinutesAt } from "@/lib/chart";
@@ -10,10 +11,8 @@ import type { Duration } from "@/lib/types";
 // spec_screens.md 5-3 · 와이어프레임 W3 · W3-B · W3-M · W3-N. 좌표는 차트 프레임(1300 × 190) 기준.
 // 막대는 설치 지점에서 오른쪽으로 뻗는다. 비율은 설치 탭과 같다(lib/chart.ts).
 const AXIS_LEFT = 16;
-const AXIS_RIGHT = 1284;
 const INSTALL_X = 130;
-const BAR_END = 1100; // 가장 긴 막대의 오른쪽 끝. "측정 대상 제외" 라벨과 겹치지 않도록 안쪽
-const FULL = BAR_END - INSTALL_X;
+const END_GAP = 200; // 가장 긴 막대 끝 오른쪽 "측정 대상 제외" 라벨 자리. 막대 끝 = 차트 너비 - 200
 const BASE_Y = 150;
 const TALL_H = 62;
 const LOW_H = 34;
@@ -37,6 +36,11 @@ type Props = {
 };
 
 export function AttributionChart({ row, compare, event }: Props) {
+  // 콘텐츠 너비에 맞춰 좌표 계산: 양 끝 라벨 자리는 고정, 막대 구간만 늘고 줄어든다
+  const boxRef = useRef<HTMLDivElement>(null);
+  const width = useElementWidth(boxRef);
+  const AXIS_RIGHT = width - 16;
+  const FULL = width - END_GAP - INSTALL_X;
   const [hoverX, setHoverX] = useState<number | null>(null);
   const { snap, lineW } = usePixelSnap(LINE_W);
   const chart = attributionChart(row.value, { compare: event ? undefined : compare, event });
@@ -62,7 +66,7 @@ export function AttributionChart({ row, compare, event }: Props) {
     : [{ title: null, inside: covers(row.value) }];
 
   return (
-    <div className="relative h-190 rounded-8 border border-border bg-white" onMouseMove={onMove} onMouseLeave={() => setHoverX(null)}>
+    <div ref={boxRef} className="relative h-190 rounded-8 border border-border bg-white" onMouseMove={onMove} onMouseLeave={() => setHoverX(null)}>
       {/* 축 */}
       <div className="absolute h-1 bg-divider" style={{ left: AXIS_LEFT, width: AXIS_RIGHT - AXIS_LEFT, top: BASE_Y }} />
       <div className="absolute w-1 bg-divider" style={{ left: INSTALL_X, top: 0, height: BASE_Y }} />

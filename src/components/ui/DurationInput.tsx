@@ -11,7 +11,7 @@ import type { Cell, Duration, Unit } from "@/lib/types";
 import { Popover } from "./Popover";
 import { useOutsideClose } from "./useOutsideClose";
 
-// spec_screens.md 3-1 값 입력(값 칸 110 + 단위 칸 90) · 3-2 값 드롭다운
+// spec_screens.md 3-1 값 입력(값 칸 110 + 단위 칸 90, 좁으면 값 칸이 최소 86까지 줄어듦) · 3-2 값 드롭다운
 type Props = {
   tab: Tab;
   cell: Cell;
@@ -33,6 +33,7 @@ export function DurationInput({ tab, cell, shown, follow, disabled, onChange }: 
   const [menu, setMenu] = useState<"value" | "unit" | null>(null);
   const boxRef = useRef<HTMLDivElement>(null);
   const popRef = useRef<HTMLDivElement>(null);
+  const unitRef = useRef<HTMLButtonElement>(null);
   // 직접 입력한 값: Enter 또는 바깥을 눌러 닫을 때 적용
   const pending = useRef<Cell | null>(null);
   const close = useCallback(() => {
@@ -50,11 +51,11 @@ export function DurationInput({ tab, cell, shown, follow, disabled, onChange }: 
 
   if (disabled) {
     return (
-      <div className="flex gap-8">
-        <div className="flex h-38 w-110 items-center rounded-6 bg-bg-muted px-12 text-body text-text-placeholder">
+      <div className="flex w-full max-w-208 gap-8">
+        <div className="flex h-38 min-w-86 flex-1 items-center rounded-6 bg-bg-muted px-12 text-body text-text-placeholder">
           {shown.value}
         </div>
-        <div className="flex h-38 w-90 items-center rounded-6 bg-bg-muted px-12 text-body text-text-placeholder">
+        <div className="flex h-38 w-90 shrink-0 items-center rounded-6 bg-bg-muted px-12 text-body text-text-placeholder">
           {UNIT_LABEL[shown.unit]}
         </div>
       </div>
@@ -67,11 +68,11 @@ export function DurationInput({ tab, cell, shown, follow, disabled, onChange }: 
   };
 
   return (
-    <div ref={boxRef} className="relative flex gap-8">
+    <div ref={boxRef} className="relative flex w-full max-w-208 gap-8">
       <button
         type="button"
         onClick={() => toggle("value")}
-        className={`flex h-38 w-110 items-center justify-between rounded-6 bg-white pr-8 pl-12 text-body ${
+        className={`flex h-38 min-w-86 flex-1 items-center justify-between rounded-6 bg-white pr-8 pl-12 text-body ${
           menu === "value" ? "border-2 border-primary pl-11" : "border border-border"
         } text-text-primary`}
       >
@@ -79,9 +80,10 @@ export function DurationInput({ tab, cell, shown, follow, disabled, onChange }: 
         <ValueIcon className="text-icon-strong" style={{ fontSize: 18 }} />
       </button>
       <button
+        ref={unitRef}
         type="button"
         onClick={() => toggle("unit")}
-        className="flex h-38 w-90 items-center justify-between rounded-6 bg-bg-muted pr-8 pl-12 text-body text-text-primary"
+        className="flex h-38 w-90 shrink-0 items-center justify-between rounded-6 bg-bg-muted pr-8 pl-12 text-body text-text-primary"
       >
         {UNIT_LABEL[shown.unit]}
         <ExpandMoreIcon className="text-icon-strong" style={{ fontSize: 18 }} />
@@ -100,7 +102,7 @@ export function DurationInput({ tab, cell, shown, follow, disabled, onChange }: 
           }}
         />
       </Popover>
-      <Popover anchorRef={boxRef} popRef={popRef} open={menu === "unit"} offsetX={118}>
+      <Popover anchorRef={unitRef} popRef={popRef} open={menu === "unit"}>
         <div className="w-90 rounded-8 border border-border bg-white py-6 shadow-dropdown">
           {UNIT_OPTIONS[tab].map((o) => (
             <button
